@@ -1,0 +1,19 @@
+{
+  "name": "minicollab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node bin/server.js",
+    "dev": "node --watch bin/server.js",
+    "test": "node --test",
+    "bench": "node bench/run.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.34.1"
+}
