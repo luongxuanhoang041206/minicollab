@@ -10,6 +10,11 @@ import { cors } from '../src/middleware/cors.js';
 import { errorHandler } from '../src/middleware/error-handler.js';
 import { requestId } from '../src/middleware/request-id.js';
 import { routerMiddleware } from '../src/middleware/router.js';
+import { authenticate } from '../src/middleware/authenticate.js';
+import { createAuthHandlers } from '../src/handlers/auth.js';
+import { createPasswordHasher } from '../src/lib/password.js';
+import { createTokenService } from '../src/lib/token.js';
+import { createMemoryUserStore } from '../src/storage/memory-users.js';
 
 const config = loadConfig();
 const logger = createLogger({
@@ -19,7 +24,24 @@ const logger = createLogger({
 
 const limits = { bodyBytes: 1_048_576 };
 const router = createRouter();
-registerRoutes(router, { config, limits });
+const users = createMemoryUserStore();
+const hashMode = process.env.AUTH_HASH_MODE ?? 'async';
+if (hashMode === 'sync' && config.env === 'production') {
+    throw new Error('AUTH_HASH_MODE=sync is only allowed outside production');
+}
+const hasher = createPasswordHasher({ mode: hashMode });
+const tokens = createTokenService({
+    secret: config.auth.secret,
+    ttlSeconds: config.auth.tokenTtlSeconds,
+});
+const auth = createAuthHandlers({
+    users,
+    hasher,
+    tokens,
+    ttlSeconds: config.auth.tokenTtlSeconds,
+});
+registerRoutes(router, { config, limits, auth });
+const authMiddleware = authenticate({ tokens, users });
 
 const server = createApp({
     logger,
@@ -27,6 +49,7 @@ const server = createApp({
         errorHandler(),
         requestId,
         accessLog(),
+        authMiddleware,
         cors({ origins: ['http://localhost:5173'] }),
         bodyParser({ limit: limits.bodyBytes }),
         routerMiddleware(router),

@@ -22,11 +22,27 @@ export function loadConfig(env = process.env) {
         throw new Error(`Invalid LOG_LEVEL: ${logLevel}`);
     }
 
-    // 7. Return frozen object
+    const authSecret = env.AUTH_SECRET;
+    if (typeof authSecret !== 'string' || authSecret.trim().length < 32) {
+        throw new Error('AUTH_SECRET is required and must be at least 32 characters');
+    }
+
+    const rawTokenTtlSeconds = env.AUTH_TOKEN_TTL_SECONDS ?? '3600';
+    const tokenTtlSeconds = Number(rawTokenTtlSeconds);
+    if (!Number.isSafeInteger(tokenTtlSeconds) || tokenTtlSeconds <= 0) {
+        throw new Error('Invalid AUTH_TOKEN_TTL_SECONDS: must be a positive integer');
+    }
+
+    const auth = Object.freeze({
+        secret: authSecret,
+        tokenTtlSeconds,
+    });
+
     return Object.freeze({
         env: nodeEnv,
         port,
         logLevel,
+        auth,
     });
 }
  

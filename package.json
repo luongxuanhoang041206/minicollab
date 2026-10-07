@@ -11,9 +11,10 @@
   "scripts": {
     "start": "node bin/server.js",
     "dev": "node --watch bin/server.js",
-    "test": "node --test test/router.test.js test/app.test.js test/config.test.js test/logger.test.js test/smoke.test.js test/pipeline.test.js test/process-policy.test.js test/middleware/access-log.test.js test/middleware/body-parser.test.js test/middleware/cors.test.js test/middleware/error-handler.test.js test/middleware/order.test.js test/middleware/pipeline.test.js test/middleware/request-id.test.js test/middleware/router.test.js",
+    "test": "node --test test/router.test.js test/app.test.js test/config.test.js test/logger.test.js test/smoke.test.js test/pipeline.test.js test/process-policy.test.js test/user-store.test.js test/password.test.js test/token.test.js test/auth.http.test.js test/middleware/access-log.test.js test/middleware/body-parser.test.js test/middleware/cors.test.js test/middleware/error-handler.test.js test/middleware/order.test.js test/middleware/pipeline.test.js test/middleware/request-id.test.js test/middleware/router.test.js",
     "bench": "node bench/pipeline.js",
-    "bench:http": "node bench/pipeline.js --http"
+    "bench:http": "node bench/pipeline.js --http",
+    "bench:auth": "node bench/auth.js --http"
   },
   "keywords": [],
   "author": "",

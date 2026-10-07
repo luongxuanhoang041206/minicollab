@@ -20,7 +20,12 @@ test('uncaught callback exception is fatal and exits with code 1', async () => {
   const root = fileURLToPath(new URL('../', import.meta.url));
   const child = spawn(process.execPath, ['bin/server.js'], {
     cwd: root,
-    env: { ...process.env, PORT: String(port), LOG_LEVEL: 'error' },
+    env: {
+      ...process.env,
+      PORT: String(port),
+      LOG_LEVEL: 'error',
+      AUTH_SECRET: 'test-only-secret-that-is-at-least-32-characters',
+    },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let output = '';

@@ -20,12 +20,14 @@ export function buildTestApp({
   limits = { bodyBytes: 1_048_576 },
   logger = defaultLogger,
   additionalMiddleware = [],
+  authentication = [],
   pipeline,
 } = {}) {
   const middleware = pipeline ?? [
     errorHandler(),
     requestId,
     accessLog(),
+    ...authentication,
     cors({ origins: config.corsOrigins ?? ['http://localhost:5173'] }),
     bodyParser({ limit: limits.bodyBytes }),
     ...additionalMiddleware,

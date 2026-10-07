@@ -1,5 +1,6 @@
 // src/routes.js — tất cả route handlers và đăng ký route
 import { sendJson } from './core/response.js';
+import { requireAuth } from './middleware/authenticate.js';
 
 // ─── Handlers ────────────────────────────────────────────────────────────────
 
@@ -83,7 +84,7 @@ function callbackThrowHandler(ctx) {
 
 // ─── Registrar ────────────────────────────────────────────────────────────────
 
-export function registerRoutes(router, { config, limits = {} }) {
+export function registerRoutes(router, { config, limits = {}, auth } = {}) {
   router.get('/health', healthHandler);
   router.post('/echo', (ctx) => {
     ctx.limits = limits;
@@ -96,6 +97,14 @@ export function registerRoutes(router, { config, limits = {} }) {
       g.get('/block', blockHandler);
       g.get('/boom', boomHandler);
       g.get('/callback-throw', callbackThrowHandler);
+    });
+  }
+
+  if (auth) {
+    router.group('/auth', (g) => {
+      g.post('/register', auth.register);
+      g.post('/login', auth.login);
+      g.get('/me', requireAuth(auth.me));
     });
   }
 }
